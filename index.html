@@ -4,9 +4,9 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>SCaLE 11x - TDD for Ops </title>
+		<title>LA DevOps - TDD for Ops </title>
 
-		<meta name="description" content="TDD for Ops presentation given at the Sothern California Linux Expo">
+		<meta name="description" content="TDD for Ops presentation given at LA DevOps">
 		<meta name="author" content="Christopher Webber">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -62,7 +62,7 @@
 
         <section>
           <h2>Outline</h2>
-          <ul>
+          <ul> 
             <li>Why Testing</li>
             <li>What is Testing</li>
             <li>What to Test</li>
@@ -179,6 +179,21 @@
         </section>
 
         <section>
+          <h3>Puppet Code</h3>
+          <pre><code>
+package {'httpd':
+  ensure => installed
+}
+          </code></pre>
+
+          <h3>rspec-puppet</h3>
+          <pre><code>
+it { should contain_package('httpd').with_ensure('installed') }
+          </code></pre>
+
+        </section>
+
+        <section>
           <h2>Important Config Elements</h2>
           <ul>
             <li>Is the Include directive in the apache config?</li>
@@ -189,11 +204,60 @@
         </section>
 
         <section>
+          <h3>Puppet Code</h3>
+          <pre><code>
+file {'/etc/ssh/sshd_config':
+  ensure  => present,
+  mode    => '0644',
+  owner   => 'root',
+  group   => 'root',
+  content => template('ssh/etc/ssh/sshd_config.erb')
+}
+          </code></pre>
+          <h3>rspec-puppet</h3>
+          <pre><code>
+it do
+ should contain_file('/etc/ssh/sshd_config') \
+   .with_mode('0644') \
+   .with_owner('root')
+end
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>FAIL</h1>
+        </section>
+        <section>
+          <h3>Let's Try That Again</h3>
+          <pre><code>
+it "Enable GSSAPI" do
+  should contain_file('/etc/ssh/sshd_config') \
+    .with_content(/^GSSAPIAuthentication yes/)
+end
+
+it "Enable X11 Forwarding" do
+  should contain_file('/etc/ssh/sshd_config') \
+    .with_content(/^X11Forwarding yes/)
+end
+          </code></pre>
+        </section>
+
+        <section>
           <h2>Security Considerations</h2>
           <ul>
             <li>Is logging enabled?</li>
             <li>Are we disabling display_errors in PHP?</li>
           </ul>
+        </section>
+
+        <section>
+          <h3>rspec-puppet</h3>
+          <pre><code>
+it "Disable root login via ssh" do
+  should contain_file('/etc/ssh/sshd_config') \
+    .with_content(/^PermitRootLogin no/)
+end
+          </code></pre>
         </section>
 
         <section>
@@ -213,12 +277,33 @@
         </section>
 
         <section>
+          <h3>rspec-puppet</h3>
+          <pre><code>
+it "Stop fucking alerting that ssh is down" do
+  should contain_file('/etc/ssh/sshd_config') \
+    .with_content(/^MaxStartups 40/)
+end
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>Code Coverage</h1>
+          <ul>
+            <li>Misleading</li>
+            <li>Not sure whether this is going to be a useful metric</li>
+            <li>Example: <a href="https://github.com/electrical/puppet-bucky">electrical/puppet-bucky</a></li>
+          </ul>
+        </section>
+
+        <section>
+
           <h1>Next Steps</h1>
           <ul>
             <li>Automation via Continuous Integration</li>
             <li>Integration testing (Test Kitchen)</li>
             <li>Nagios/Monitoring Integration</li>
           </ul>
+
         </section>
 
         <section>
